@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Favorite Celebrities</title>
+  <style type="text/css">
+    button,
+    div,
+    form,
+    input {
+      margin: 10px;
+    }
+  </style>
+
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+
+  <div class="container">
+    <h1>Celebrity Search</h1>
+
+    <!-- Rendered Buttons will get Dumped Here  -->
+    <div id="buttons-view"></div>
+
+    <form id="celeb-form">
+      <label for="celeb-input">Add a Celebrity</label>
+      <input type="text" id="celeb-input">
+      <br>
+
+
+      <input id="add-celeb" type="submit" value="Add a Celebrity">
+    </form>
+
+
+    <div id="celeb-view"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript">
+
+      var celebs = ["Elvis Presley", "Marilyn", "John Wayne", "Bob Marley", "Robin Williams", "Johnny Depp", "Audrey Hepburn", "Will Smith", "Clint Eastwood", "George Clooney", "Lady Gaga", "The Rock", "Madonna", "Charlie Chaplin", "Oprah Winfrey", "Eminem", "David Beckham"];
+
+      // displayCelebInfo function re-renders the HTML to display the appropriate content
+      function displayCelebInfo() {
+
+        $("#celeb-view").empty();
+
+        var celeb = $(this).attr("data-name");
+        var queryURL = "https://api.giphy.com/v1/gifs/search?q=" +
+          celeb + "&api_key=dc6zaTOxFJmzC&limit=10";
+
+
+        $.ajax({
+          url: queryURL,
+          method: "GET"
+        }).then(function (response) {
+
+          var results = response.data;
+
+          console.log("Response -->", results);
+          for (var i = 0; i < results.length; i++) {
+
+
+
+
+
+            var celebImage = $("<img>");
+
+            celebImage.attr("src", results[i].images.fixed_height.url);
+            celebImage.attr("data-still", results[i].images.fixed_height.url);
+            celebImage.attr("data-animate", results[i].images.fixed_height.url);
+            celebImage.attr("data-state", "still");
+            celebImage.attr("class", "gif");
+
+
+
+
+            $("#celeb-view").prepend(celebImage);
+
+          }
+
+        });
+      }
+
+
+      function renderButtons() {
+
+
+        // (this is necessary otherwise you will have repeat buttons)
+        $("#buttons-view").empty();
+
+
+        for (var i = 0; i < celebs.length; i++) {
+
+          // This code $("<button>") is all jQuery needs to create the beginning and end tag. (<button></button>)
+          var a = $("<button>");
+
+          a.addClass("celeb-btn");
+          // Adding a data-attribute
+          a.attr("data-name", celebs[i]);
+          // Providing the initial button text
+          a.text(celebs[i]);
+          // Adding the button to the buttons-view div
+          $("#buttons-view").append(a);
+        }
+      }
+
+
+      $("#add-celeb").on("click", function (event) {
+        event.preventDefault();
+        // This line grabs the input from the textbox
+        var celeb = $("#celeb-input").val().trim();
+
+
+        celebs.push(celeb);
+
+
+        renderButtons();
+      });
+
+      $(".gif").on("click", function () {
+        console.log(this);
+        // The attr jQuery method allows us to get or set the value of any attribute on our HTML element
+        var state = $(this).attr("data-state");
+        // If the clicked image's state is still, update its src attribute to what its data-animate value is.
+        // Then, set the image's data-state to animate
+        // Else set src to the data-still value
+        if (state === "still") {
+          $(this).attr("src", $(this).attr("data-animate"));
+          $(this).attr("data-state", "animate");
+        } else {
+          $(this).attr("src", $(this).attr("data-still"));
+          $(this).attr("data-state", "still");
+        }
+      });
+
+
+
+      $(document).on("click", ".celeb-btn", displayCelebInfo);
+
+      // Calling the renderButtons function to display the intial buttons
+      renderButtons();
+    </script>
+  </div>
+</body>
+
+</html>

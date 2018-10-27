@@ -1,0 +1,5 @@
+Steps yet to complete:
+
+1. Clicking on add button again will add multiple celebrity buttons.
+2. Pause functionality of the gifs is not working yet.
+3. More styling to the page. 
